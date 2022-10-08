@@ -36,9 +36,9 @@ confidences = []
 
 for y in range(0, numRows):
 # Create rectangular structuring element and dilate
-    thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-    dilate = cv2.dilate(thresh, kernel, iterations=10)
+    #thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    #kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+    #dilate = cv2.dilate(thresh, kernel, iterations=10)
 
     scoresData = scores[0, 0, y]
     xData0 = geometry[0, 0, y]
