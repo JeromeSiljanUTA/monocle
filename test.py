@@ -47,10 +47,6 @@ def str2bool(v):
 
 trained_model = 'craft_mlt_25k.pth'
 
-result_folder = './result/'
-if not os.path.isdir(result_folder):
-    os.mkdir(result_folder)
-
 def test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_net=None):
     t0 = time.time()
 
