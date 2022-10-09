@@ -96,6 +96,20 @@ def test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_
     return boxes, polys, ret_score_text
 
 def read_img(image_path):
+    # set constants
+    # model path
+    trained_model = 'craft_mlt_25k.pth'
+    # load net
+    net = CRAFT()     # initialize
+    net.load_state_dict(copyStateDict(torch.load(trained_model, map_location='cpu')))
+    net.eval()
+    # LinkRefiner
+    refine_net = None
+    t = time.time()
+    text_threshold = 0.7
+    link_threshold = 0.4
+    low_text = 0.4
+    poly = True
     thresh_const = 4
     threshold = 0
     prev_endY = 0
@@ -106,10 +120,6 @@ def read_img(image_path):
     image = imgproc.loadImage(image_path)
     test_img = img.imread(image_path)
 
-    text_threshold = 0.7
-    link_threshold = 0.4
-    low_text = 0.4
-    poly = True
     bboxes, polys, score_text = test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_net)
 
     # boxes has form [[startX, startY, endX, endY]]
@@ -144,19 +154,18 @@ def read_img(image_path):
 
     print(f'{image_path} message: {message}')
 
-if __name__ == '__main__':
-
-    # model path
-    trained_model = 'craft_mlt_25k.pth'
-    # load net
-    net = CRAFT()     # initialize
-
-    net.load_state_dict(copyStateDict(torch.load(trained_model, map_location='cpu')))
-    net.eval()
-
-    # LinkRefiner
-    refine_net = None
-
-    t = time.time()
-
-    read_img('training-strips/cartoon2.PNG')
+#if __name__ == '__main__':
+#    # model path
+#    trained_model = 'craft_mlt_25k.pth'
+#    # load net
+#    net = CRAFT()     # initialize
+#
+#    net.load_state_dict(copyStateDict(torch.load(trained_model, map_location='cpu')))
+#    net.eval()
+#
+#    # LinkRefiner
+#    refine_net = None
+#
+#    t = time.time()
+#
+#read_img('training-strips/cartoon2.PNG')
