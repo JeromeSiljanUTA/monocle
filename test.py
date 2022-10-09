@@ -103,6 +103,7 @@ def show_graph(lined_boxes):
             plt.imshow(test_img)
 
     plt.show()
+    plt.close()
 
 
 def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, refine_net=None):
@@ -194,14 +195,15 @@ if __name__ == '__main__':
 
     t = time.time()
 
-    thresh_const = 5
-    threshold = 0
-    prev_endY = 0
-    lined_boxes = []
-    lined_boxes_index = 0
 
     # load data
     for k, image_path in enumerate(image_list):
+        thresh_const = 5
+        threshold = 0
+        prev_endY = 0
+        lined_boxes = []
+        lined_boxes_index = 0
+
         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
         image = imgproc.loadImage(image_path)
         test_img = img.imread(image_path)
