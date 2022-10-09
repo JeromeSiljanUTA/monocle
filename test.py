@@ -48,7 +48,6 @@ def str2bool(v):
 # parser
 parser = argparse.ArgumentParser(description='CRAFT Text Detection')
 parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
-parser.add_argument('--text_threshold', default=0.7, type=float, help='text confidence threshold')
 parser.add_argument('--low_text', default=0.4, type=float, help='text low-bound score')
 parser.add_argument('--link_threshold', default=0.4, type=float, help='link confidence threshold')
 parser.add_argument('--poly', default=False, action='store_true', help='enable polygon type')
@@ -122,7 +121,8 @@ def read_img(image_path):
     image = imgproc.loadImage(image_path)
     test_img = img.imread(image_path)
 
-    bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.poly, refine_net)
+    text_threshold = 0.7
+    bboxes, polys, score_text = test_net(net, image, text_threshold, args.link_threshold, args.low_text, args.poly, refine_net)
 
     # boxes has form [[startX, startY, endX, endY]]
     unsorted_boxes = [[int(box[0][0]), int(box[0][1]), int(box[1][0]), int(box[2][1])] for box in bboxes]
