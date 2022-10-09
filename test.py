@@ -233,15 +233,18 @@ if __name__ == '__main__':
             min_startY = min([val[1] for val in para])
             max_endX = max([val[2] for val in para])
             max_endY = max([val[3] for val in para])
-
-            print(f'startX: {min_startX}  startY: {min_startY}')
-            print(f'endX: {max_endX}    endY: {max_endY}')
-
+            #print(f'startX: {min_startX}  startY: {min_startY}')
+            #print(f'endX: {max_endX}    endY: {max_endY}')
             rects.append(para)
             plt.scatter(min_startX, min_startY)
             plt.scatter(max_endX, max_endY)
 
-        plt.show()
+            orig = cv2.imread(image_path)
+            crop = orig[min_startY:max_endY, min_startX:max_endX]
+            cv2.imshow('crop', crop)
+            cv2.waitKey()
+
+        #plt.show()
         break
 
         #    plt.scatter(ext_startX, ext_startY)
