@@ -13,6 +13,9 @@ import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
+from matplotlib import pyplot as plt
+from matplotlib import image as img
+from matplotlib.patches import Rectangle
 
 from PIL import Image
 
@@ -100,9 +103,12 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
     # Post-processing
     boxes, polys = craft_utils.getDetBoxes(score_text, score_link, text_threshold, link_threshold, low_text, poly)
 
+
     # coordinate adjustment
     boxes = craft_utils.adjustResultCoordinates(boxes, ratio_w, ratio_h)
     polys = craft_utils.adjustResultCoordinates(polys, ratio_w, ratio_h)
+
+    #print(boxes)
     for k in range(len(polys)):
         if polys[k] is None: polys[k] = boxes[k]
 
@@ -158,8 +164,20 @@ if __name__ == '__main__':
     for k, image_path in enumerate(image_list):
         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
         image = imgproc.loadImage(image_path)
+        test_img = img.imread(image_path)
 
         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
+        
+        for box in bboxes:
+            startX = int(box[0][0])
+            startY = int(box[0][1])
+            endX = int(box[1][0])
+            endY = int(box[2][1])
+            plt.scatter(startX, startY)
+            plt.scatter(endX, endY)
+            plt.imshow(test_img)
+
+        plt.show()
 
         # save score text
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
@@ -167,5 +185,6 @@ if __name__ == '__main__':
         cv2.imwrite(mask_file, score_text)
 
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
+        break
 
     print("elapsed time : {}s".format(time.time() - t))
