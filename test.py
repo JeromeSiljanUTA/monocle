@@ -205,4 +205,7 @@ if __name__ == '__main__':
 
     t = time.time()
 
-    read_img('training-strips/cartoon2.PNG')
+    import frontend
+    frontend.startup()
+
+    #read_img('training-strips/cartoon2.PNG')
