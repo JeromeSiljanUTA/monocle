@@ -91,18 +91,24 @@ for (startX, startY, endX, endY) in boxes:
     endY = int(endY * rH)
 
     # draw the bounding box on the image
-    cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 3)
+    #cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 3)
     #cv2.imshow("Text Detection", orig)
     k = cv2.waitKey(30) & 0xff
     if k == 27:
         break
 
-startX = [int(startX * rW) for (startX, startY, endX, endY) in boxes]
-startY = [int(startY * rH) for (startX, startY, endX, endY) in boxes]
-endX = [int(endX * rW) for (startX, startY, endX, endY) in boxes]
-endY = [int(endY * rH) for (startX, startY, endX, endY) in boxes]
+arr_startX = [int(startX * rW) for (startX, startY, endX, endY) in boxes]
+arr_startY = [int(startY * rH) for (startX, startY, endX, endY) in boxes]
+arr_endX = [int(endX * rW) for (startX, startY, endX, endY) in boxes]
+arr_endY = [int(endY * rH) for (startX, startY, endX, endY) in boxes]
 
-plt.scatter(startX, startY)
-plt.scatter(endX, endY)
+#plt.scatter(arr_startX, arr_startY)
+#plt.scatter(arr_endX, arr_endY)
+
+midY = [((int(endY * rH) - int(startY * rH))/2) + int(startY * rH) for (startX, startY, endX, endY) in boxes]
+midX = [((int(endX * rW) - int(startX * rW))/2) + int(startX * rW) for (startX, startY, endX, endY) in boxes]
+
+plt.scatter(midX, midY)
+
 plt.imshow(orig)
 plt.show()
