@@ -102,9 +102,8 @@ def show_graph(lined_boxes):
             plt.scatter(box_coords[2], box_coords[3], c='orange')
             plt.imshow(test_img)
 
-    plt.show()
-    plt.close()
-
+    plt.savefig(f'result/res_{image_path[16:-4]}_sep{image_path[-4:]}')
+    plt.clf()
 
 def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, refine_net=None):
     t0 = time.time()
@@ -198,7 +197,7 @@ if __name__ == '__main__':
 
     # load data
     for k, image_path in enumerate(image_list):
-        thresh_const = 5
+        thresh_const = 4
         threshold = 0
         prev_endY = 0
         lined_boxes = []
@@ -224,9 +223,8 @@ if __name__ == '__main__':
             lined_boxes.append([lined_boxes_index, box])
             prev_endY = box[1]
         
-        show_graph(lined_boxes)
         print()
-            #plt.savefig(f'result/res_{image_path[16:-4]}_sep{image_path[-4:]}')
+        show_graph(lined_boxes)
 
         # save score text
         #filename, file_ext = os.path.splitext(os.path.basename(image_path))
