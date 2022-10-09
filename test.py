@@ -31,7 +31,6 @@ import zipfile
 
 from craft import CRAFT
 
-
 from collections import OrderedDict
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
@@ -53,7 +52,6 @@ parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type
 parser.add_argument('--text_threshold', default=0.7, type=float, help='text confidence threshold')
 parser.add_argument('--low_text', default=0.4, type=float, help='text low-bound score')
 parser.add_argument('--link_threshold', default=0.4, type=float, help='link confidence threshold')
-parser.add_argument('--cuda', default=True, type=str2bool, help='Use cuda for inference')
 parser.add_argument('--canvas_size', default=1280, type=int, help='image size for inference')
 parser.add_argument('--mag_ratio', default=1.5, type=float, help='image magnification ratio')
 parser.add_argument('--poly', default=False, action='store_true', help='enable polygon type')
@@ -71,7 +69,7 @@ result_folder = './result/'
 if not os.path.isdir(result_folder):
     os.mkdir(result_folder)
 
-def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, refine_net=None):
+def test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_net=None):
     t0 = time.time()
 
     # resize
@@ -82,8 +80,6 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
     x = imgproc.normalizeMeanVariance(img_resized)
     x = torch.from_numpy(x).permute(2, 0, 1)    # [h, w, c] to [c, h, w]
     x = Variable(x.unsqueeze(0))                # [c, h, w] to [b, c, h, w]
-    if cuda:
-        x = x.cuda()
 
     # forward pass
     with torch.no_grad():
@@ -136,7 +132,7 @@ def read_img(image_path):
     image = imgproc.loadImage(image_path)
     test_img = img.imread(image_path)
 
-    bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
+    bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.poly, refine_net)
 
     # boxes has form [[startX, startY, endX, endY]]
     unsorted_boxes = [[int(box[0][0]), int(box[0][1]), int(box[1][0]), int(box[2][1])] for box in bboxes]
@@ -175,15 +171,7 @@ if __name__ == '__main__':
     net = CRAFT()     # initialize
 
     #print('Loading weights from checkpoint (' + args.trained_model + ')')
-    if args.cuda:
-        net.load_state_dict(copyStateDict(torch.load(args.trained_model)))
-    else:
-        net.load_state_dict(copyStateDict(torch.load(args.trained_model, map_location='cpu')))
-
-    if args.cuda:
-        net = net.cuda()
-        net = torch.nn.DataParallel(net)
-        cudnn.benchmark = False
+    net.load_state_dict(copyStateDict(torch.load(args.trained_model, map_location='cpu')))
 
     net.eval()
 
@@ -193,19 +181,11 @@ if __name__ == '__main__':
         from refinenet import RefineNet
         refine_net = RefineNet()
         print('Loading weights of refiner from checkpoint (' + args.refiner_model + ')')
-        if args.cuda:
-            refine_net.load_state_dict(copyStateDict(torch.load(args.refiner_model)))
-            refine_net = refine_net.cuda()
-            refine_net = torch.nn.DataParallel(refine_net)
-        else:
-            refine_net.load_state_dict(copyStateDict(torch.load(args.refiner_model, map_location='cpu')))
+        refine_net.load_state_dict(copyStateDict(torch.load(args.refiner_model, map_location='cpu')))
 
         refine_net.eval()
         args.poly = True
 
     t = time.time()
 
-    import app
-    app.startup()
-
-    #read_img('training-strips/cartoon2.PNG')
+    read_img('training-strips/cartoon2.PNG')
