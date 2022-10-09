@@ -224,15 +224,30 @@ if __name__ == '__main__':
             prev_endY = box[1]
         print()
         max_para = max([box[0] for box in lined_boxes])
-        for box in lined_boxes:
-            for para in range(max_para + 1):
 
+        plt.imshow(test_img)
+        rects = []
+        for x in range(max_para + 1):
+            para  = [box[1] for box in lined_boxes if box[0] == x]
+            min_startX = min([val[0] for val in para])
+            min_startY = min([val[1] for val in para])
+            max_endX = max([val[2] for val in para])
+            max_endY = max([val[3] for val in para])
 
-            plt.imshow(test_img)
-            plt.scatter(ext_startX, ext_startY)
-            plt.scatter(ext_endX, ext_endY)
-            plt.show()
-            plt.clear()
+            print(f'startX: {min_startX}  startY: {min_startY}')
+            print(f'endX: {max_endX}    endY: {max_endY}')
+
+            rects.append(para)
+            plt.scatter(min_startX, min_startY)
+            plt.scatter(max_endX, max_endY)
+
+        plt.show()
+        break
+
+        #    plt.scatter(ext_startX, ext_startY)
+        #    plt.scatter(ext_endX, ext_endY)
+        #    plt.show()
+        #    plt.clear()
     
 
 
