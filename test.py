@@ -48,7 +48,6 @@ def str2bool(v):
 # parser
 parser = argparse.ArgumentParser(description='CRAFT Text Detection')
 parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
-parser.add_argument('--poly', default=False, action='store_true', help='enable polygon type')
 parser.add_argument('--refine', default=False, action='store_true', help='enable link refiner')
 parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
 
@@ -122,7 +121,8 @@ def read_img(image_path):
     text_threshold = 0.7
     link_threshold = 0.4
     low_text = 0.4
-    bboxes, polys, score_text = test_net(net, image, text_threshold, link_threshold, low_text, args.poly, refine_net)
+    poly = True
+    bboxes, polys, score_text = test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_net)
 
     # boxes has form [[startX, startY, endX, endY]]
     unsorted_boxes = [[int(box[0][0]), int(box[0][1]), int(box[1][0]), int(box[2][1])] for box in bboxes]
