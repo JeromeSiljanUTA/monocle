@@ -51,7 +51,6 @@ parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type
 parser.add_argument('--text_threshold', default=0.7, type=float, help='text confidence threshold')
 parser.add_argument('--low_text', default=0.4, type=float, help='text low-bound score')
 parser.add_argument('--link_threshold', default=0.4, type=float, help='link confidence threshold')
-parser.add_argument('--mag_ratio', default=1.5, type=float, help='image magnification ratio')
 parser.add_argument('--poly', default=False, action='store_true', help='enable polygon type')
 parser.add_argument('--refine', default=False, action='store_true', help='enable link refiner')
 parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
@@ -65,8 +64,8 @@ if not os.path.isdir(result_folder):
 def test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_net=None):
     t0 = time.time()
 
-    # resize
-    img_resized, target_ratio, size_heatmap = imgproc.resize_aspect_ratio(image, 1280, interpolation=cv2.INTER_LINEAR, mag_ratio=args.mag_ratio)
+    # resize                                                                    canvas_size
+    img_resized, target_ratio, size_heatmap = imgproc.resize_aspect_ratio(image, 1280, interpolation=cv2.INTER_LINEAR, mag_ratio=1.5)
     ratio_h = ratio_w = 1 / target_ratio
 
     # preprocessing
