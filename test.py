@@ -45,8 +45,6 @@ def copyStateDict(state_dict):
 def str2bool(v):
     return v.lower() in ("yes", "y", "true", "t", "1")
 
-trained_model = 'craft_mlt_25k.pth'
-
 def test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_net=None):
     t0 = time.time()
 
@@ -147,11 +145,13 @@ def read_img(image_path):
     print(f'{image_path} message: {message}')
 
 if __name__ == '__main__':
+
+    # model path
+    trained_model = 'craft_mlt_25k.pth'
     # load net
     net = CRAFT()     # initialize
 
     net.load_state_dict(copyStateDict(torch.load(trained_model, map_location='cpu')))
-
     net.eval()
 
     # LinkRefiner
