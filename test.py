@@ -53,6 +53,8 @@ parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pt
 
 args = parser.parse_args()
 
+trained_model = 'craft_mlt_25k.pth'
+
 result_folder = './result/'
 if not os.path.isdir(result_folder):
     os.mkdir(result_folder)
