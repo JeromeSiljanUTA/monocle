@@ -42,6 +42,7 @@ def copyStateDict(state_dict):
 def str2bool(v):
     return v.lower() in ("yes", "y", "true", "t", "1")
 
+# parser
 parser = argparse.ArgumentParser(description='CRAFT Text Detection')
 parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
 parser.add_argument('--text_threshold', default=0.7, type=float, help='text confidence threshold')
@@ -57,7 +58,6 @@ parser.add_argument('--refine', default=False, action='store_true', help='enable
 parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
 
 args = parser.parse_args()
-
 
 """ For test images in a folder """
 image_list, _, _ = file_utils.get_files(args.test_folder)
