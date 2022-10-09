@@ -222,9 +222,21 @@ if __name__ == '__main__':
 
             lined_boxes.append([lined_boxes_index, box])
             prev_endY = box[1]
-        
         print()
-        show_graph(lined_boxes)
+        max_para = max([box[0] for box in lined_boxes])
+        for box in lined_boxes:
+            for para in range(max_para + 1):
+
+
+            plt.imshow(test_img)
+            plt.scatter(ext_startX, ext_startY)
+            plt.scatter(ext_endX, ext_endY)
+            plt.show()
+            plt.clear()
+    
+
+
+        #show_graph(lined_boxes)
 
         # save score text
         #filename, file_ext = os.path.splitext(os.path.basename(image_path))
