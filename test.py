@@ -160,6 +160,13 @@ if __name__ == '__main__':
 
     t = time.time()
 
+    color_index = 0
+    colors = ['red', 'blue', 'green', 'purple']
+    curr_color = colors[color_index]
+    thresh_const = 3
+    threshold = 0
+    prev_endY = 0
+
     # load data
     for k, image_path in enumerate(image_list):
         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
@@ -168,16 +175,26 @@ if __name__ == '__main__':
 
         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
         
-        for box in bboxes:
+        for index, box in enumerate(bboxes):
             startX = int(box[0][0])
             startY = int(box[0][1])
             endX = int(box[1][0])
             endY = int(box[2][1])
-            plt.scatter(startX, startY)
-            plt.scatter(endX, endY)
+            if(index == 0):
+                threshold = thresh_const + abs(startY - endY)
+            elif(abs(prev_endY - startY) > threshold):
+                color_index += 1
+                curr_color = colors[color_index]
+                print('new line')
+            else:
+                print(f'{endY}\t{prev_endY}\t{abs(endY - prev_endY)}')
+
+            prev_endY = endY
+            plt.scatter(startX, startY, c=curr_color)
+            plt.scatter(endX, endY, c=curr_color)
             plt.imshow(test_img)
 
-        plt.show()
+        #plt.show()
 
         # save score text
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
