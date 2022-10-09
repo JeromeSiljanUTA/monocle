@@ -45,13 +45,6 @@ def copyStateDict(state_dict):
 def str2bool(v):
     return v.lower() in ("yes", "y", "true", "t", "1")
 
-# parser
-parser = argparse.ArgumentParser(description='CRAFT Text Detection')
-parser.add_argument('--refine', default=False, action='store_true', help='enable link refiner')
-parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
-
-args = parser.parse_args()
-
 trained_model = 'craft_mlt_25k.pth'
 
 result_folder = './result/'
@@ -161,21 +154,12 @@ if __name__ == '__main__':
     # load net
     net = CRAFT()     # initialize
 
-    #print('Loading weights from checkpoint (' + args.trained_model + ')')
     net.load_state_dict(copyStateDict(torch.load(trained_model, map_location='cpu')))
 
     net.eval()
 
     # LinkRefiner
     refine_net = None
-    if args.refine:
-        from refinenet import RefineNet
-        refine_net = RefineNet()
-        print('Loading weights of refiner from checkpoint (' + args.refiner_model + ')')
-        refine_net.load_state_dict(copyStateDict(torch.load(args.refiner_model, map_location='cpu')))
-
-        refine_net.eval()
-        args.poly = True
 
     t = time.time()
 
