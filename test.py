@@ -47,7 +47,6 @@ def str2bool(v):
 
 # parser
 parser = argparse.ArgumentParser(description='CRAFT Text Detection')
-parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
 parser.add_argument('--refine', default=False, action='store_true', help='enable link refiner')
 parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
 
@@ -163,7 +162,7 @@ if __name__ == '__main__':
     net = CRAFT()     # initialize
 
     #print('Loading weights from checkpoint (' + args.trained_model + ')')
-    net.load_state_dict(copyStateDict(torch.load(args.trained_model, map_location='cpu')))
+    net.load_state_dict(copyStateDict(torch.load(trained_model, map_location='cpu')))
 
     net.eval()
 
