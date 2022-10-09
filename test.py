@@ -69,6 +69,42 @@ result_folder = './result/'
 if not os.path.isdir(result_folder):
     os.mkdir(result_folder)
 
+def show_graph(lined_boxes):
+    for box in lined_boxes:
+        if(box[0] == 0):
+            box_coords = box[1]
+            plt.scatter(box_coords[0], box_coords[1], c='red')
+            plt.scatter(box_coords[2], box_coords[3], c='red')
+            plt.imshow(test_img)
+        elif(box[0] == 1):
+            box_coords = box[1]
+            plt.scatter(box_coords[0], box_coords[1], c='green')
+            plt.scatter(box_coords[2], box_coords[3], c='green')
+            plt.imshow(test_img)
+        elif(box[0] == 2):
+            box_coords = box[1]
+            plt.scatter(box_coords[0], box_coords[1], c='blue')
+            plt.scatter(box_coords[2], box_coords[3], c='blue')
+            plt.imshow(test_img)
+        elif(box[0] == 3):
+            box_coords = box[1]
+            plt.scatter(box_coords[0], box_coords[1], c='purple')
+            plt.scatter(box_coords[2], box_coords[3], c='purple')
+            plt.imshow(test_img)
+        elif(box[0] == 4):
+            box_coords = box[1]
+            plt.scatter(box_coords[0], box_coords[1], c='yellow')
+            plt.scatter(box_coords[2], box_coords[3], c='yellow')
+            plt.imshow(test_img)
+        elif(box[0] == 5):
+            box_coords = box[1]
+            plt.scatter(box_coords[0], box_coords[1], c='orange')
+            plt.scatter(box_coords[2], box_coords[3], c='orange')
+            plt.imshow(test_img)
+
+    plt.show()
+
+
 def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, refine_net=None):
     t0 = time.time()
 
@@ -123,8 +159,6 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
 
     return boxes, polys, ret_score_text
 
-
-
 if __name__ == '__main__':
     # load net
     net = CRAFT()     # initialize
@@ -160,12 +194,11 @@ if __name__ == '__main__':
 
     t = time.time()
 
-    color_index = 0
-    colors = ['red', 'blue', 'green', 'purple']
-    curr_color = colors[color_index]
-    thresh_const = 3
+    thresh_const = 5
     threshold = 0
     prev_endY = 0
+    lined_boxes = []
+    lined_boxes_index = 0
 
     # load data
     for k, image_path in enumerate(image_list):
@@ -174,34 +207,30 @@ if __name__ == '__main__':
         test_img = img.imread(image_path)
 
         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
-        
-        for index, box in enumerate(bboxes):
-            startX = int(box[0][0])
-            startY = int(box[0][1])
-            endX = int(box[1][0])
-            endY = int(box[2][1])
+
+        # boxes has form [[startX, startY, endX, endY]]
+        unsorted_boxes = [[int(box[0][0]), int(box[0][1]), int(box[1][0]), int(box[2][1])] for box in bboxes]
+        boxes = sorted(unsorted_boxes, key=lambda x: x[1])
+        print()
+
+        for index, box in enumerate(boxes):
             if(index == 0):
-                threshold = thresh_const + abs(startY - endY)
-            elif(abs(prev_endY - startY) > threshold):
-                color_index += 1
-                curr_color = colors[color_index]
-                print('new line')
-            else:
-                print(f'{endY}\t{prev_endY}\t{abs(endY - prev_endY)}')
+                threshold = thresh_const + abs(box[1] - box[3])
+            elif(abs(prev_endY - box[1]) > threshold):
+                lined_boxes_index += 1
 
-            prev_endY = endY
-            plt.scatter(startX, startY, c=curr_color)
-            plt.scatter(endX, endY, c=curr_color)
-            plt.imshow(test_img)
-
-        #plt.show()
+            lined_boxes.append([lined_boxes_index, box])
+            prev_endY = box[1]
+        
+        show_graph(lined_boxes)
+        print()
+            #plt.savefig(f'result/res_{image_path[16:-4]}_sep{image_path[-4:]}')
 
         # save score text
-        filename, file_ext = os.path.splitext(os.path.basename(image_path))
-        mask_file = result_folder + "/res_" + filename + '_mask.jpg'
-        cv2.imwrite(mask_file, score_text)
+        #filename, file_ext = os.path.splitext(os.path.basename(image_path))
+        #mask_file = result_folder + "/res_" + filename + '_mask.jpg'
+        #cv2.imwrite(mask_file, score_text)
 
-        file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
-        break
+        #file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
 
-    print("elapsed time : {}s".format(time.time() - t))
+    #print("elapsed time : {}s".format(time.time() - t))
