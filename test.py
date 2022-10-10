@@ -134,7 +134,6 @@ def read_img(image_path):
 
         lined_boxes.append([lined_boxes_index, box])
         prev_endY = box[1]
-    print()
     max_para = max([box[0] for box in lined_boxes])
 
     plt.imshow(test_img)
@@ -152,7 +151,7 @@ def read_img(image_path):
         ocr_string = pytesseract.image_to_string(crop)
         message.append(ocr_string)
 
-    print(f'{image_path} message: {message}')
+    return message
 
 #if __name__ == '__main__':
 #    # model path
