@@ -1,20 +1,22 @@
-<!DOCTYPE html>
 <html>
-
     <title>Monocle</title>
-
-    <h1>Welcome To Monocle</h1>
-
+    <h1>Monocle</h1>
+    <h3>Upload comic here:</h3>
+    <p>Note: After submitting query, page may take up to a minute to load</p>
     <body>
-        {{message}}
-        <br>
-        <br>
-        <br>
-    </body>
-    <form method="POST" action="" enctype="multipart/form-data">
-      <p><input type="file" name="file"></p>
-      <p><input type="submit" value="Submit"></p>
+        <form action = "http://localhost:5001/" method = "POST"
+    enctype = "multipart/form-data">
+        <input type = "file" name = "file" />
+        <input type = "submit"/>
     </form>
-
+    <table style="width:100%">
+        <tr>
+            <td> <img src="{{ img }}" width="500"> </td>
+            <td>{% for line in message %}
+                <br>{{ line }}<br>
+                {% endfor %}
+            </td>
+        </tr>
+        </table>
+    </body>
 </html>
-
