@@ -12,7 +12,10 @@
     <table style="width:100%">
         <tr>
             <td> <img src="{{ img }}" width="500"> </td>
-            <td> {{ message }} </td>
+            <td>{% for line in message %}
+                <br>{{ line }}<br>
+                {% endfor %}
+            </td>
         </tr>
         </table>
     </body>

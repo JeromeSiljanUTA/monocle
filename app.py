@@ -10,8 +10,9 @@ def return_message(arr_message):
     html_message = ''
     for message in arr_message:
         html_message += message
-        html_message += '\n\n'
+        html_message += '<br><br>'
 
+    print(html_message)
     return html_message
 
 @app.route('/upload', methods = ['GET', 'POST'])
@@ -22,7 +23,8 @@ def upload():
         f.save(img_path)
         return render_template('upload.html', 
                                img=img_path, 
-                               message=return_message(test.read_img(img_path)))
+                               message=test.read_img(img_path))
+                               #message=return_message(test.read_img(img_path)))
     else:
         return render_template('upload.html', img='', message='')
 
