@@ -149,9 +149,9 @@ def read_img(image_path):
         crop = orig[min_startY:max_endY, min_startX:max_endX]
 
         ocr_string = pytesseract.image_to_string(crop)
-        message.append(ocr_string)
+        message.append(ocr_string.upper())
 
-    return message.upper()
+    return message
 
 #if __name__ == '__main__':
 #    # model path
