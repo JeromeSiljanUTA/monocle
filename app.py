@@ -10,6 +10,7 @@ def return_message(arr_message):
     html_message = ''
     for message in arr_message:
         html_message += message
+        html_message += '\n\n'
 
     return html_message
 
