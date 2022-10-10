@@ -1,31 +1,22 @@
-from flask import Flask
-from werkzeug import secure_filename
+from flask import Flask, render_template, request, redirect, url_for
 import os
 
-# def startup():
 app = Flask(__name__)
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLD = '/Users/blabla/Desktop/kenetelli/htmlfi'
-UPLOAD_FOLDER = os.path.join(APP_ROOT, UPLOAD_FOLD)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+message = 'ollo everybody'
+image_path = ''
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return render_template('index.html', message = message)
 
-@app.route('/upload')
+@app.route('/', methods=['POST'])
 def upload_file():
-    return render_template('upload.html')
-
-@app.route('/uploader', methods = ['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        f = request.files['file']
-        f.save(secure_filename(os.path.join(app.config['UPLOAD_FOLDER'], f.filename)))
-        return 'file uploaded successfully'
+    uploaded_file = request.files['file']
+    if uploaded_file.filename != '':
+        print(uploaded_file.filename)
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(debug = True, port=5001)
-
-# startup()
+    
