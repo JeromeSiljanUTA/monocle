@@ -31,6 +31,7 @@ import zipfile
 from craft import CRAFT
 from collections import OrderedDict
 
+
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
         start_idx = 1
@@ -42,49 +43,57 @@ def copyStateDict(state_dict):
         new_state_dict[name] = v
     return new_state_dict
 
+
 def str2bool(v):
     return v.lower() in ("yes", "y", "true", "t", "1")
 
-def test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_net=None):
+
+def test_net(
+    net, image, text_threshold, link_threshold, low_text, poly, refine_net=None
+):
     t0 = time.time()
 
     # resize                                                                    canvas_size
-    img_resized, target_ratio, size_heatmap = imgproc.resize_aspect_ratio(image, 1280, interpolation=cv2.INTER_LINEAR, mag_ratio=1.5)
+    img_resized, target_ratio, size_heatmap = imgproc.resize_aspect_ratio(
+        image, 1280, interpolation=cv2.INTER_LINEAR, mag_ratio=1.5
+    )
     ratio_h = ratio_w = 1 / target_ratio
 
     # preprocessing
     x = imgproc.normalizeMeanVariance(img_resized)
-    x = torch.from_numpy(x).permute(2, 0, 1)    # [h, w, c] to [c, h, w]
-    x = Variable(x.unsqueeze(0))                # [c, h, w] to [b, c, h, w]
+    x = torch.from_numpy(x).permute(2, 0, 1)  # [h, w, c] to [c, h, w]
+    x = Variable(x.unsqueeze(0))  # [c, h, w] to [b, c, h, w]
 
     # forward pass
     with torch.no_grad():
         y, feature = net(x)
 
     # make score and link map
-    score_text = y[0,:,:,0].cpu().data.numpy()
-    score_link = y[0,:,:,1].cpu().data.numpy()
+    score_text = y[0, :, :, 0].cpu().data.numpy()
+    score_link = y[0, :, :, 1].cpu().data.numpy()
 
     # refine link
     if refine_net is not None:
         with torch.no_grad():
             y_refiner = refine_net(y, feature)
-        score_link = y_refiner[0,:,:,0].cpu().data.numpy()
+        score_link = y_refiner[0, :, :, 0].cpu().data.numpy()
 
     t0 = time.time() - t0
     t1 = time.time()
 
     # Post-processing
-    boxes, polys = craft_utils.getDetBoxes(score_text, score_link, text_threshold, link_threshold, low_text, poly)
-
+    boxes, polys = craft_utils.getDetBoxes(
+        score_text, score_link, text_threshold, link_threshold, low_text, poly
+    )
 
     # coordinate adjustment
     boxes = craft_utils.adjustResultCoordinates(boxes, ratio_w, ratio_h)
     polys = craft_utils.adjustResultCoordinates(polys, ratio_w, ratio_h)
 
-    #print(boxes)
+    # print(boxes)
     for k in range(len(polys)):
-        if polys[k] is None: polys[k] = boxes[k]
+        if polys[k] is None:
+            polys[k] = boxes[k]
 
     t1 = time.time() - t1
 
@@ -95,13 +104,14 @@ def test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_
 
     return boxes, polys, ret_score_text
 
+
 def read_img(image_path):
     # set constants
     # model path
-    trained_model = 'craft_mlt_25k.pth'
+    trained_model = "craft_mlt_25k.pth"
     # load net
-    net = CRAFT()     # initialize
-    net.load_state_dict(copyStateDict(torch.load(trained_model, map_location='cpu')))
+    net = CRAFT()  # initialize
+    net.load_state_dict(copyStateDict(torch.load(trained_model, map_location="cpu")))
     net.eval()
     # LinkRefiner
     refine_net = None
@@ -116,20 +126,25 @@ def read_img(image_path):
     lined_boxes = []
     lined_boxes_index = 0
 
-    print(f'Test image {image_path}')
+    print(f"Test image {image_path}")
     image = imgproc.loadImage(image_path)
     test_img = img.imread(image_path)
 
-    bboxes, polys, score_text = test_net(net, image, text_threshold, link_threshold, low_text, poly, refine_net)
+    bboxes, polys, score_text = test_net(
+        net, image, text_threshold, link_threshold, low_text, poly, refine_net
+    )
 
     # boxes has form [[startX, startY, endX, endY]]
-    unsorted_boxes = [[int(box[0][0]), int(box[0][1]), int(box[1][0]), int(box[2][1])] for box in bboxes]
+    unsorted_boxes = [
+        [int(box[0][0]), int(box[0][1]), int(box[1][0]), int(box[2][1])]
+        for box in bboxes
+    ]
     boxes = sorted(unsorted_boxes, key=lambda x: x[1])
 
     for index, box in enumerate(boxes):
-        if(index == 0):
+        if index == 0:
             threshold = thresh_const + abs(box[1] - box[3])
-        elif(abs(prev_endY - box[1]) > threshold):
+        elif abs(prev_endY - box[1]) > threshold:
             lined_boxes_index += 1
 
         lined_boxes.append([lined_boxes_index, box])
@@ -139,7 +154,7 @@ def read_img(image_path):
     plt.imshow(test_img)
     message = []
     for x in range(max_para + 1):
-        para  = [box[1] for box in lined_boxes if box[0] == x]
+        para = [box[1] for box in lined_boxes if box[0] == x]
         min_startX = min([val[0] for val in para])
         min_startY = min([val[1] for val in para])
         max_endX = max([val[2] for val in para])
